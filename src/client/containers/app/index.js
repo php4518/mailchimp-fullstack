@@ -38,6 +38,7 @@ const App = (props) => {
           <PublicRoute exact path="/uploadTemplate" component={Template} />
           <PublicRoute exact path="/login" component={Login} />
           <PrivateRoute exact path="/" component={Home} />
+          <PrivateRoute path="*" component={Home} />
         </Switch>
       </main>
     </div>

@@ -26,7 +26,6 @@ function actualMailchimpRequest(req) {
   if (req.body) {
     options.body = req.body;
   }
-  debugger
   return request(options);
 }
 
@@ -36,7 +35,6 @@ function actualMailchimpRequest(req) {
  * @returns {Response}
  */
 function mailchimpRequest(req, res) {
-  debugger
   actualMailchimpRequest(req)
     .then(response => res.send(response))
     .catch((err) => {
