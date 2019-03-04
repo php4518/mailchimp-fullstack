@@ -3,7 +3,7 @@ const request = require('request-promise');
 const mailchimpConfig = {
   baseUrl: 'https://us20.api.mailchimp.com/3.0',
   username: 'any',
-  password: 'a25f82c562f5b7c18ec76f0ce0adabef-us20',
+  password: process.env.MAILCHIMP_PASS,
 };
 
 function actualMailchimpRequest(req) {
@@ -26,6 +26,7 @@ function actualMailchimpRequest(req) {
   if (req.body) {
     options.body = req.body;
   }
+  debugger
   return request(options);
 }
 
@@ -35,6 +36,7 @@ function actualMailchimpRequest(req) {
  * @returns {Response}
  */
 function mailchimpRequest(req, res) {
+  debugger
   actualMailchimpRequest(req)
     .then(response => res.send(response))
     .catch((err) => {

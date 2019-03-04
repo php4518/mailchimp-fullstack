@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { push } from 'react-router-redux';
 import { Button } from 'reactstrap';
+import EmailEditor from 'react-email-editor';
 import { updateCampaignContent, sendCampaign } from '../../modules/mailChimp';
 import SpinnerLoader from '../../components/spinnerLoader';
 
@@ -10,24 +11,21 @@ class Template extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      campaignId: props.location.state.id,
+      campaignId: props.location.state ? props.location.state.id : '',
       htmlContent: null,
       uploadingData: false
     };
   }
 
-  handleFile = (event) => {
-    const htmlFile = event.target.files[0];
-
-    const fileReader = new FileReader();
-    fileReader.readAsText(htmlFile);
-    fileReader.onloadend = this.handleFileContent;
+  exportTemplate = () => {
+    this.editor.exportHtml((data) => {
+      const { html } = data;
+      this.handleUpload(html);
+    });
   };
 
-  handleFileContent = e => this.setState({ htmlContent: e.target.result });
-
-  handleUpload = () => {
-    const { campaignId, htmlContent } = this.state;
+  handleUpload = (htmlContent) => {
+    const { campaignId } = this.state;
     const { updateCampaignContent, sendCampaign, gotoHomePage } = this.props;
     this.setState({ uploadingData: true });
     updateCampaignContent(campaignId, { html: htmlContent })
@@ -55,12 +53,13 @@ class Template extends React.Component {
     return (
       <div className="container">
         <br />
-        <h3>Select a email template:</h3>
+        <div>
+          <EmailEditor
+            ref={editor => this.editor = editor}
+          />
+        </div>
         <br />
-        <input type="file" name="file" accept=".html" onChange={this.handleFile} className="centered mt-10 ml-10 mr-10" />
-        <br />
-        <br />
-        <Button className="btn btn-primary" color="primary" onClick={this.handleUpload}>Send</Button>
+        <Button className="btn btn-primary" color="primary" onClick={this.exportTemplate}>Send</Button>
         <SpinnerLoader isVisible={uploadingData} />
       </div>
     );
