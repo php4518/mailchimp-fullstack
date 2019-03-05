@@ -4,7 +4,7 @@ import { bindActionCreators } from 'redux';
 import { push } from 'react-router-redux';
 import { Button, Input } from 'reactstrap';
 import { LIST_ID } from '../../helpers/constants';
-import { addMailChimpCampaign } from '../../modules/mailChimp';
+import { addMailChimpCampaign, updateCampaignContent } from '../../modules/mailChimp';
 import { validateEmail } from '../../helpers/validators';
 import SpinnerLoader from '../../components/spinnerLoader';
 
@@ -40,7 +40,9 @@ class Campaigns extends React.Component {
     } else if (validateEmail(replyTo)) {
       alert('Please enter valid email address.');
     } else {
-      const { addMailChimpCampaign, gotoAddTemplate } = this.props;
+      const {
+        addMailChimpCampaign, gotoAddTemplate, updateCampaignContent, htmlContent
+      } = this.props;
       const body = {
         recipients: { list_id: LIST_ID },
         type: 'regular',
@@ -53,12 +55,23 @@ class Campaigns extends React.Component {
       };
       this.setState({ uploadingData: true });
       addMailChimpCampaign(body)
-        .then(response => gotoAddTemplate(response.id))
+        .then(({ id }) => {
+          updateCampaignContent(id, { html: htmlContent })
+            .then(() => {
+              this.setState({ uploadingData: false });
+              gotoAddTemplate(id);
+            })
+            .catch((error) => {
+              this.setState({ uploadingData: false });
+              console.log('Error uploading template', error);
+              alert('Error uploading template, Please try again.');
+            });
+        })
         .catch((error) => {
+          this.setState({ uploadingData: false });
           console.log('Error adding campaign', error);
           alert('Error adding campaign, Please try again.');
-        })
-        .finally(() => this.setState({ uploadingData: false }));
+        });
     }
   };
 
@@ -94,12 +107,17 @@ class Campaigns extends React.Component {
   }
 }
 
+const mapStateToProps = state => ({
+  htmlContent: state.mailchimp.htmlContent,
+});
+
 const mapDispatchToProps = dispatch => bindActionCreators({
   addMailChimpCampaign,
-  gotoAddTemplate: id => push('/uploadTemplate', { id })
+  updateCampaignContent,
+  gotoAddTemplate: id => push('/uploadCSV', { id })
 }, dispatch);
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps
 )(Campaigns);

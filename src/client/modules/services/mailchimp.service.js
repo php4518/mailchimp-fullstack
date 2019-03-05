@@ -24,6 +24,12 @@ export function sendCampaign(id) {
     .catch(error => Promise.reject(error));
 }
 
+export function scheduleCampaign(id, time) {
+  return axios.post(`/api/mailchimp/campaigns/${id}/actions/schedule`, { schedule_time: time })
+    .then(({ data }) => Promise.resolve(data))
+    .catch(error => Promise.reject(error));
+}
+
 export default {
-  batchSubmit, addMailChimpCampaign, updateCampaignContent, sendCampaign
+  batchSubmit, addMailChimpCampaign, updateCampaignContent, sendCampaign, scheduleCampaign
 };

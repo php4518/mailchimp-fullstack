@@ -5,8 +5,6 @@ import { connect } from 'react-redux';
 import CSV from '../csv';
 import Campaign from '../campaigns';
 import Template from '../template';
-import Login from '../login';
-import Home from '../home';
 
 const App = (props) => {
   const PublicRoute = ({ component: Component, ...rest }) => (
@@ -25,7 +23,7 @@ const App = (props) => {
       render={routeProps => (
         props.user
           ? <Component {...routeProps} />
-          : <Redirect to="/uploadCSV" />
+          : <Redirect to="/uploadTemplate" />
       )}
     />
   );
@@ -36,9 +34,8 @@ const App = (props) => {
           <PublicRoute exact path="/uploadCSV" component={CSV} />
           <PublicRoute exact path="/addCampaignDetails" component={Campaign} />
           <PublicRoute exact path="/uploadTemplate" component={Template} />
-          <PublicRoute exact path="/login" component={Login} />
-          <PrivateRoute exact path="/" component={Home} />
-          <PrivateRoute path="*" component={Home} />
+          <PrivateRoute exact path="/" component={Template} />
+          <PrivateRoute path="*" component={Template} />
         </Switch>
       </main>
     </div>

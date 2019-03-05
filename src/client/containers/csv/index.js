@@ -4,16 +4,28 @@ import { bindActionCreators } from 'redux';
 import { push } from 'react-router-redux';
 import { Button } from 'reactstrap';
 import csv from 'csvtojson';
+import DateTime from 'react-datetime';
+import '../../../../node_modules/react-datetime/css/react-datetime.css';
+import moment from 'moment';
 import { LIST_ID } from '../../helpers/constants';
-import { addMembers } from '../../modules/mailChimp';
+import {
+  addMembers, sendCampaign, scheduleCampaign
+} from '../../modules/mailChimp';
 import SpinnerLoader from '../../components/spinnerLoader';
+
+const minuteInterval = 15;
+const roundedUp = Math.ceil(moment().minute() / minuteInterval) * minuteInterval;
 
 class CSVUpload extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      campaignId: props.location.state ? props.location.state.id : '',
       csvContent: null,
-      uploadingData: false
+      uploadingData: false,
+      enableSend: false,
+      showScheduleDate: false,
+      scheduleDate: moment().minute(roundedUp)
     };
   }
 
@@ -26,12 +38,12 @@ class CSVUpload extends React.Component {
   };
 
   handleFileContent = (e) => {
-    this.setState({ csvContent: e.target.result });
+    this.setState({ csvContent: e.target.result, enableSend: false });
   };
 
   handleUpload = () => {
     const { csvContent } = this.state;
-    const { addMembers, gotoAddCampaignDetails } = this.props;
+    const { addMembers } = this.props;
 
     if (!csvContent) {
       alert('Please select file first.');
@@ -54,7 +66,7 @@ class CSVUpload extends React.Component {
             })
           }));
           addMembers(members)
-            .then(gotoAddCampaignDetails)
+            .then(() => this.setState({ enableSend: true }))
             .catch((error) => {
               console.log('error uploading csv data', error);
               alert('error uploading csv data');
@@ -71,8 +83,72 @@ class CSVUpload extends React.Component {
     }
   };
 
+  sendCampaignNow = () => {
+    const { campaignId } = this.state;
+    const {
+      sendCampaign, gotoHomePage
+    } = this.props;
+    this.setState({ uploadingData: true });
+    debugger;
+    sendCampaign(campaignId)
+      .then(() => {
+        alert('campaign sent successfully!!!');
+        gotoHomePage();
+      })
+      .catch((error) => {
+        console.log('Error sending mail', error);
+        alert('Error sending mail, Please try again.');
+      })
+      .finally(() => this.setState({ uploadingData: false }));
+  };
+
+  handleScheduleDate = date => this.setState({ scheduleDate: date });
+
+  getValidDates = (current) => {
+    const yesterday = moment().subtract(1, 'day');
+    return current.isAfter(yesterday);
+  };
+
+  getValidTimes = (dateTime) => {
+    // date is today, so only allow future times
+    if (moment().isSame(dateTime, 'day')) {
+      return {
+        hours: { min: dateTime.hours(), max: 23, step: 1 },
+        minutes: { min: 0, max: 59, step: minuteInterval },
+      };
+    }
+    // date is in the future, so allow all times
+    return {
+      hours: { min: 0, max: 23, step: 1 },
+      minutes: { min: 0, max: 59, step: minuteInterval },
+    };
+  };
+
+  scheduleCampaign = () => {
+    const { campaignId, scheduleDate } = this.state;
+    const { scheduleCampaign, gotoHomePage } = this.props;
+    if (moment().isAfter(scheduleDate)) {
+      alert('please select valid time');
+      return;
+    }
+    const sendOn = moment.utc(scheduleDate).format();
+    this.setState({ uploadingData: true });
+    scheduleCampaign(campaignId, sendOn)
+      .then(() => {
+        alert('campaign has been scheduled!!!');
+        gotoHomePage();
+      })
+      .catch((error) => {
+        console.log('Error sending mail', error);
+        alert('Error sending mail, Please try again.');
+      })
+      .finally(() => this.setState({ uploadingData: false }));
+  };
+
   render() {
-    const { uploadingData } = this.state;
+    const {
+      uploadingData, enableSend, scheduleDate, showScheduleDate
+    } = this.state;
     return (
       <div className="container">
         <br />
@@ -82,6 +158,29 @@ class CSVUpload extends React.Component {
         <br />
         <br />
         <Button className="btn btn-primary" color="primary" onClick={this.handleUpload}>Upload Members</Button>
+        <br />
+        <br />
+        {
+          showScheduleDate
+          && (
+            <React.Fragment>
+              <DateTime
+                value={scheduleDate}
+                inputProps={{ readOnly: true }}
+                isValidDate={this.getValidDates}
+                timeConstraints={this.getValidTimes(scheduleDate)}
+                onChange={this.handleScheduleDate}
+                dateFormat="MMMM DD YYYY,"
+                closeOnSelect
+                closeOnTab
+              />
+              <br />
+            </React.Fragment>
+          )
+        }
+        <Button className="btn btn-primary" color="primary" disabled={!enableSend} onClick={this.sendCampaignNow}>Send now</Button>
+        <Button className="btn btn-primary ml-5" color="primary" disabled={!enableSend} onClick={showScheduleDate ? this.scheduleCampaign : () => this.setState({ showScheduleDate: true })}>{showScheduleDate ? 'Schedule' : 'Schedule Later'}</Button>
+        <br />
         <SpinnerLoader isVisible={uploadingData} />
       </div>
     );
@@ -90,6 +189,9 @@ class CSVUpload extends React.Component {
 
 const mapDispatchToProps = dispatch => bindActionCreators({
   addMembers,
+  sendCampaign,
+  scheduleCampaign,
+  gotoHomePage: () => push('/'),
   gotoAddCampaignDetails: () => push('/addCampaignDetails')
 }, dispatch);
 
