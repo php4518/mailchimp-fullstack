@@ -46,7 +46,10 @@ class Login extends React.Component {
     const { credentials } = this.state;
     logInUser(credentials)
       .then(user => goToHome(user))
-      .catch(e => console.log(e));
+      .catch((e) => {
+        alert('Please enter valid credentials.');
+        console.log(e);
+      });
   };
 
   render() {

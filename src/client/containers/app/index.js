@@ -2,9 +2,11 @@ import React from 'react';
 import { Redirect, Route, Switch } from 'react-router-dom';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
+import Login from '../login';
 import CSV from '../csv';
 import Campaign from '../campaigns';
 import Template from '../template';
+import NavigationBar from '../navigationBar';
 
 const App = (props) => {
   const PublicRoute = ({ component: Component, ...rest }) => (
@@ -23,17 +25,19 @@ const App = (props) => {
       render={routeProps => (
         props.user
           ? <Component {...routeProps} />
-          : <Redirect to="/uploadTemplate" />
+          : <Redirect to="/login" />
       )}
     />
   );
   return (
     <div className="container app-wrapper">
+      {props.user && <NavigationBar />}
       <main>
         <Switch>
-          <PublicRoute exact path="/uploadCSV" component={CSV} />
-          <PublicRoute exact path="/addCampaignDetails" component={Campaign} />
-          <PublicRoute exact path="/uploadTemplate" component={Template} />
+          <PublicRoute exact path="/login" component={Login} />
+          <PrivateRoute exact path="/uploadTemplate" component={Template} />
+          <PrivateRoute exact path="/addCampaignDetails" component={Campaign} />
+          <PrivateRoute exact path="/uploadCSV" component={CSV} />
           <PrivateRoute exact path="/" component={Template} />
           <PrivateRoute path="*" component={Template} />
         </Switch>
