@@ -89,7 +89,6 @@ class CSVUpload extends React.Component {
       sendCampaign, gotoHomePage
     } = this.props;
     this.setState({ uploadingData: true });
-    debugger;
     sendCampaign(campaignId)
       .then(() => {
         alert('campaign sent successfully!!!');

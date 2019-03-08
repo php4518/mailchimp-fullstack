@@ -13,10 +13,11 @@ class NavigationBar extends React.Component {
     return (
       <div>
         <Navbar color="light" light expand="md">
-          <NavbarBrand href="/">{`Hello, ${user.username}`}</NavbarBrand>
+          <NavbarBrand href="/">{`Hello, ${user.email.split('@')[0]}`}</NavbarBrand>
           <Col sm={{ size: 10, offset: 2 }}>
             <Button onClick={logOutUser}>logout</Button>
-          </Col></Navbar>
+          </Col>
+        </Navbar>
       </div>
     );
   }

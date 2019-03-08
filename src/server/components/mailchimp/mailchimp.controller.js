@@ -43,4 +43,4 @@ function mailchimpRequest(req, res) {
     });
 }
 
-module.exports = { mailchimpRequest, actualMailchimpRequest };
+module.exports = { mailchimpRequest };

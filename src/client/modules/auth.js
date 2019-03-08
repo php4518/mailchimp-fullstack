@@ -12,7 +12,7 @@ const initialState = {
 export default (state = initialState, action) => {
   switch (action.type) {
     case USER_LOGIN:
-      const user = action.payload && action.payload.user;
+      const { user } = action.payload.user;
       storage.setItem(USER_LOCAL_KEY, user);
       return {
         ...state,
