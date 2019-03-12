@@ -24,7 +24,7 @@ class Campaigns extends React.Component {
     e.stopPropagation();
     e.preventDefault();
 
-    const { name, value } = e.currentTarget;
+    const { name, value } = e.target;
     this.setState({ [name]: value });
   };
 
@@ -84,21 +84,21 @@ class Campaigns extends React.Component {
         <br />
         Subject
         <br />
-        <Input type="text" name="subjectLine" id="subjectLine" placeholder="Add the subject for your campaign" value={subjectLine} onChange={this.handleChange} required />
+        <Input type="text" name="subjectLine" id="subject-line" placeholder="Add the subject for your campaign" value={subjectLine} onChange={this.handleChange} required />
         <br />
         Preview
         <br />
-        <Input type="text" name="previewText" id="previewText" placeholder="This snippet will appear in the inbox after the subject line" value={previewText} onChange={this.handleChange} />
+        <Input type="text" name="previewText" id="preview-text" placeholder="This snippet will appear in the inbox after the subject line" value={previewText} onChange={this.handleChange} />
         <br />
         Reply to
         <br />
-        <Input type="email" name="replyTo" id="replyTo" placeholder="Email Address of the sender of the campaign" value={replyTo} onChange={this.handleChange} required />
+        <Input type="email" name="replyTo" id="reply-to" placeholder="Email Address of the sender of the campaign" value={replyTo} onChange={this.handleChange} required />
         <br />
         From
         <br />
-        <Input type="email" name="fromName" id="fromName" placeholder="Name of the sender of the campaign" value={fromName} onChange={this.handleChange} required />
+        <Input type="email" name="fromName" id="from-name" placeholder="Name of the sender of the campaign" value={fromName} onChange={this.handleChange} required />
         <br />
-        <Button className="btn btn-primary" color="primary" onClick={this.handleUpload}>
+        <Button className="btn btn-primary" color="primary" id="button-add-campaign" onClick={this.handleUpload}>
           Add Campaign
         </Button>
         <SpinnerLoader isVisible={uploadingData} />
@@ -108,7 +108,7 @@ class Campaigns extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  htmlContent: state.mailchimp.htmlContent,
+  htmlContent: state.mailchimp && state.mailchimp.htmlContent,
 });
 
 const mapDispatchToProps = dispatch => bindActionCreators({

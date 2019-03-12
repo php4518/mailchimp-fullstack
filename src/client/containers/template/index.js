@@ -25,11 +25,11 @@ class Template extends React.Component {
         <br />
         <div>
           <EmailEditor
-            ref={editor => this.editor = editor}
+            ref={(editor) => { this.editor = editor; }}
           />
         </div>
         <br />
-        <Button className="btn btn-primary" color="primary" onClick={this.exportTemplate}>Send</Button>
+        <Button className="btn btn-primary" id="button-send" color="primary" onClick={this.exportTemplate}>Send</Button>
       </div>
     );
   }

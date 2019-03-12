@@ -20,7 +20,7 @@ class CSVUpload extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      campaignId: props.location.state ? props.location.state.id : '',
+      campaignId: props.location ? (props.location.state ? props.location.state.id : '') : '',
       csvContent: null,
       uploadingData: false,
       enableSend: false,
@@ -153,10 +153,10 @@ class CSVUpload extends React.Component {
         <br />
         <h3>Select a CSV file:</h3>
         <br />
-        <input type="file" name="file" accept=".csv" onChange={this.handleCSVFile} />
+        <input type="file" name="file" id="csv-input" accept=".csv" onChange={this.handleCSVFile} />
         <br />
         <br />
-        <Button className="btn btn-primary" color="primary" onClick={this.handleUpload}>Upload Members</Button>
+        <Button className="btn btn-primary" id="button-upload-member" color="primary" onClick={this.handleUpload}>Upload Members</Button>
         <br />
         <br />
         {
@@ -177,8 +177,8 @@ class CSVUpload extends React.Component {
             </React.Fragment>
           )
         }
-        <Button className="btn btn-primary" color="primary" disabled={!enableSend} onClick={this.sendCampaignNow}>Send now</Button>
-        <Button className="btn btn-primary ml-5" color="primary" disabled={!enableSend} onClick={showScheduleDate ? this.scheduleCampaign : () => this.setState({ showScheduleDate: true })}>{showScheduleDate ? 'Schedule' : 'Schedule Later'}</Button>
+        <Button className="btn btn-primary" color="primary" id="button-send" disabled={!enableSend} onClick={this.sendCampaignNow}>Send now</Button>
+        <Button className="btn btn-primary ml-5" color="primary" id="button-schedule" disabled={!enableSend} onClick={showScheduleDate ? this.scheduleCampaign : () => this.setState({ showScheduleDate: true })}>{showScheduleDate ? 'Schedule' : 'Schedule Later'}</Button>
         <br />
         <SpinnerLoader isVisible={uploadingData} />
       </div>
